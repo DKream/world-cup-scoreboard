@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>World Cup Draft Scoreboard</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #071e3d;
+      color: white;
+      margin: 0;
+      padding: 24px;
+    }
+
+    .container {
+      max-width: 1150px;
+      margin: 0 auto;
+    }
+
+    h1, h2 {
+      text-align: center;
+    }
+
+    .nav {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .nav a {
+      color: #f7c948;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .card {
+      background: #12345f;
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+    }
+
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #2f5688;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #1a4275;
+    }
+
+    .rank {
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+
+    .score {
+      font-weight: bold;
+      font-size: 1.25rem;
+    }
+
+    .small {
+      opacity: 0.85;
+      font-size: 0.9rem;
+    }
+
+    .warning {
+      color: #ffd966;
+      font-weight: bold;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: #1a4275;
+      margin: 2px;
+      font-size: 0.85rem;
+      white-space: nowrap;
+    }
+
+    .first-place {
+      background: rgba(247, 201, 72, 0.16);
+    }
+
+    button {
+      background: #f7c948;
+      color: #071e3d;
+      border: none;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #ffda6a;
+    }
+
+    .mobile-leaderboard {
+      display: none;
+    }
+
+    .mobile-player-card {
+      background: #12345f;
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+    }
+
+    .mobile-player-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .mobile-rank {
+      color: #f7c948;
+      font-weight: bold;
+      font-size: 1.1rem;
+    }
+
+    .mobile-total {
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+
+    @media (max-width: 800px) {
+      body {
+        padding: 12px;
+      }
+
+      h1 {
+        font-size: 1.6rem;
+      }
+
+      .desktop-leaderboard {
+        display: none;
+      }
+
+      .mobile-leaderboard {
+        display: block;
+      }
+
+      .nation-score-table-wrapper {
+        overflow-x: auto;
+      }
+
+      table {
+        font-size: 0.85rem;
+      }
+
+      th, td {
+        padding: 8px;
+      }
+
+      .card {
+        padding: 14px;
+      }
+
+      button {
+        width: 100%;
+        padding: 12px;
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>World Cup Draft Scoreboard</h1>
+
+    <div class="nav">
+      <a href="/team-assignments.html">View Team Assignments</a>
+    </div>
+
+    <div class="card">
+      <button onclick="loadScores()">Refresh Now</button>
+      <p class="small" id="status">Loading scoreboard...</p>
+      <p class="small warning" id="warning"></p>
+    </div>
+
+    <div class="card desktop-leaderboard">
+      <h2>Leaderboard</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Player</th>
+            <th>Drafted Nations</th>
+            <th>Breakdown</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody id="leaderboard"></tbody>
+      </table>
+    </div>
+
+    <div class="mobile-leaderboard">
+      <h2>Leaderboard</h2>
+      <div id="mobileLeaderboard"></div>
+    </div>
+
+    <div class="card">
+      <h2>Nation Score Breakdown</h2>
+      <div class="nation-score-table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Nation</th>
+              <th>Group</th>
+              <th>R32</th>
+              <th>R16</th>
+              <th>QF</th>
+              <th>SF</th>
+              <th>3rd</th>
+              <th>Final</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody id="nationScores"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    async function loadScores() {
+      const leaderboard = document.getElementById("leaderboard");
+      const mobileLeaderboard = document.getElementById("mobileLeaderboard");
+      const nationScores = document.getElementById("nationScores");
+      const status = document.getElementById("status");
+      const warning = document.getElementById("warning");
+
+      status.textContent = "Refreshing...";
+      warning.textContent = "";
+
+      try {
+        const response = await fetch("/api/scores");
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.details || data.error || "Unable to load scores.");
+        }
+
+        leaderboard.innerHTML = "";
+        mobileLeaderboard.innerHTML = "";
+        nationScores.innerHTML = "";
+
+        status.textContent =
+          `Last updated: ${new Date(data.updatedAt).toLocaleString()} | ` +
+          `Data source: ${data.source} | ` +
+          `Events found: ${data.eventCount} | ` +
+          `Cache: ${data.cacheStatus}`;
+
+        if (data.warning) {
+          warning.textContent = data.warning;
+        }
+
+        data.leaderboard.forEach((entry, index) => {
+          const row = document.createElement("tr");
+
+          if (index === 0) {
+            row.className = "first-place";
+          }
+
+          const breakdown = entry.nationBreakdown
+            .map(item => `<span class="pill">${escapeHtml(item.nation)}: ${item.score}</span>`)
+            .join("");
+
+          row.innerHTML = `
+            <td class="rank">${index + 1}</td>
+            <td>${escapeHtml(entry.player)}</td>
+            <td>${entry.nations.map(escapeHtml).join(", ")}</td>
+            <td>${breakdown}</td>
+            <td class="score">${entry.total}</td>
+          `;
+
+          leaderboard.appendChild(row);
+
+          const mobileCard = document.createElement("div");
+          mobileCard.className = "mobile-player-card";
+
+          mobileCard.innerHTML = `
+            <div class="mobile-player-header">
+              <div>
+                <div class="mobile-rank">#${index + 1}</div>
+                <strong>${escapeHtml(entry.player)}</strong>
+              </div>
+              <div class="mobile-total">${entry.total} pts</div>
+            </div>
+
+            <div class="small">Drafted Nations</div>
+            <div>${entry.nations.map(nation => `<span class="pill">${escapeHtml(nation)}</span>`).join("")}</div>
+
+            <div class="small" style="margin-top: 10px;">Breakdown</div>
+            <div>${breakdown}</div>
+          `;
+
+          mobileLeaderboard.appendChild(mobileCard);
+        });
+
+        Object.entries(data.nationScores)
+          .sort((a, b) => b[1].total - a[1].total)
+          .forEach(([nation, score]) => {
+            const row = document.createElement("tr");
+
+            row.innerHTML = `
+              <td>${escapeHtml(nation)}</td>
+              <td>${score.group || 0}</td>
+              <td>${score.r32 || 0}</td>
+              <td>${score.r16 || 0}</td>
+              <td>${score.qf || 0}</td>
+              <td>${score.sf || 0}</td>
+              <td>${score.third || 0}</td>
+              <td>${score.final || 0}</td>
+              <td class="score">${score.total || 0}</td>
+            `;
+
+            nationScores.appendChild(row);
+          });
+
+      } catch (error) {
+        status.textContent = "Scoreboard could not load.";
+        warning.textContent = error.message;
+      }
+    }
+
+    loadScores();
+
+    setInterval(loadScores, 30 * 1000);
+  </script>
+</body>
+</html>

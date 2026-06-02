@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Team Assignments</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #071e3d;
+      color: white;
+      margin: 0;
+      padding: 24px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    h1, h2 {
+      text-align: center;
+    }
+
+    .nav {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .nav a {
+      color: #f7c948;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .card {
+      background: #12345f;
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 24px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+    }
+
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #2f5688;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #1a4275;
+    }
+
+    .small {
+      opacity: 0.85;
+      font-size: 0.9rem;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #1a4275;
+      margin: 3px;
+      font-size: 0.9rem;
+      white-space: nowrap;
+    }
+
+    .available-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #0f5d45;
+      margin: 4px;
+      font-size: 0.9rem;
+      white-space: nowrap;
+    }
+
+    .flag-icon {
+      width: 22px;
+      height: 15px;
+      object-fit: cover;
+      border-radius: 2px;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.25);
+    }
+
+    .warning {
+      color: #ffd966;
+      font-weight: bold;
+    }
+
+    button {
+      background: #f7c948;
+      color: #071e3d;
+      border: none;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #ffda6a;
+    }
+
+    .count {
+      text-align: center;
+      font-size: 1rem;
+      font-weight: bold;
+      color: #f7c948;
+    }
+
+    @media (max-width: 850px) {
+      body {
+        padding: 12px;
+      }
+
+      h1 {
+        font-size: 1.6rem;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      table {
+        font-size: 0.85rem;
+      }
+
+      th, td {
+        padding: 8px;
+      }
+
+      .card {
+        padding: 14px;
+      }
+
+      button {
+        width: 100%;
+        padding: 12px;
+        font-size: 1rem;
+      }
+
+      .pill,
+      .available-pill {
+        font-size: 0.82rem;
+        padding: 5px 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Team Assignments</h1>
+
+    <div class="nav">
+      <a href="/">Back to Scoreboard</a>
+    </div>
+
+    <div class="card">
+      <button onclick="loadAssignments()">Refresh Assignments</button>
+      <p class="small" id="status">Loading assignments...</p>
+      <p class="small warning" id="warning"></p>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h2>Contestant Assignments</h2>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Contestant</th>
+              <th>Assigned Teams</th>
+            </tr>
+          </thead>
+          <tbody id="assignments"></tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <h2>Teams Available</h2>
+        <p class="count" id="availableCount"></p>
+        <div id="availableTeams"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const teamFlagCodes = {
+      "Argentina": "ar",
+      "Australia": "au",
+      "Austria": "at",
+      "Belgium": "be",
+      "Brazil": "br",
+      "Cameroon": "cm",
+      "Canada": "ca",
+      "Chile": "cl",
+      "Colombia": "co",
+      "Costa Rica": "cr",
+      "Croatia": "hr",
+      "Denmark": "dk",
+      "Ecuador": "ec",
+      "Egypt": "eg",
+      "England": "gb-eng",
+      "France": "fr",
+      "Germany": "de",
+      "Ghana": "gh",
+      "Iran": "ir",
+      "Iraq": "iq",
+      "Italy": "it",
+      "Japan": "jp",
+      "Mexico": "mx",
+      "Morocco": "ma",
+      "Netherlands": "nl",
+      "New Zealand": "nz",
+      "Nigeria": "ng",
+      "Norway": "no",
+      "Paraguay": "py",
+      "Peru": "pe",
+      "Poland": "pl",
+      "Portugal": "pt",
+      "Qatar": "qa",
+      "Saudi Arabia": "sa",
+      "Scotland": "gb-sct",
+      "Senegal": "sn",
+      "Serbia": "rs",
+      "South Africa": "za",
+      "South Korea": "kr",
+      "Spain": "es",
+      "Sweden": "se",
+      "Switzerland": "ch",
+      "Tunisia": "tn",
+      "Turkey": "tr",
+      "Ukraine": "ua",
+      "United States": "us",
+      "USA": "us",
+      "Uruguay": "uy",
+      "Wales": "gb-wls"
+    };
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function getFlagUrl(teamName) {
+      const code = teamFlagCodes[teamName];
+
+      if (!code) {
+        return null;
+      }
+
+      return `https://flagcdn.com/w40/${code}.png`;
+    }
+
+    function renderTeamPill(teamName, className) {
+      const safeTeamName = escapeHtml(teamName);
+      const flagUrl = getFlagUrl(teamName);
+
+      if (!flagUrl) {
+        return `
+          <span class="${className}">
+            ${safeTeamName}
+          </span>
+        `;
+      }
+
+      return `
+        <span class="${className}">
+          <img
+            class="flag-icon"
+            src="${flagUrl}"
+            alt="${safeTeamName} flag"
+            loading="lazy"
+          />
+          ${safeTeamName}
+        </span>
+      `;
+    }
+
+    async function loadAssignments() {
+      const assignmentsBody = document.getElementById("assignments");
+      const availableTeamsDiv = document.getElementById("availableTeams");
+      const availableCount = document.getElementById("availableCount");
+      const status = document.getElementById("status");
+      const warning = document.getElementById("warning");
+
+      status.textContent = "Refreshing...";
+      warning.textContent = "";
+      assignmentsBody.innerHTML = "";
+      availableTeamsDiv.innerHTML = "";
+      availableCount.textContent = "";
+
+      try {
+        const response = await fetch("/api/team-assignments");
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.details || data.error || "Unable to load assignments.");
+        }
+
+        status.textContent =
+          `Last updated: ${new Date(data.updatedAt).toLocaleString()} | ` +
+          `Source: ${data.source}`;
+
+        data.assignments.forEach(entry => {
+          const row = document.createElement("tr");
+
+          const teams = entry.nations
+            .map(nation => renderTeamPill(nation, "pill"))
+            .join("");
+
+          row.innerHTML = `
+            <td><strong>${escapeHtml(entry.player)}</strong></td>
+            <td>${teams}</td>
+          `;
+
+          assignmentsBody.appendChild(row);
+        });
+
+        availableCount.textContent =
+          `${data.availableTeams.length} teams available`;
+
+        if (data.availableTeams.length === 0) {
+          availableTeamsDiv.innerHTML = `<p class="small">No teams available.</p>`;
+        } else {
+          availableTeamsDiv.innerHTML = data.availableTeams
+            .map(team => renderTeamPill(team, "available-pill"))
+            .join("");
+        }
+
+      } catch (error) {
+        status.textContent = "Assignments could not load.";
+        warning.textContent = error.message;
+      }
+    }
+
+    loadAssignments();
+
+    setInterval(loadAssignments, 60 * 1000);
+  </script>
+</body>
+</html>

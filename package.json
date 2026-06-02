@@ -1,0 +1,12 @@
+{
+  "name": "world-cup-draft-scoreboard",
+  "version": "1.0.0",
+  "description": "Public read-only World Cup draft scoreboard",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.3"
+  }
+}
