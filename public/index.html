@@ -7,177 +7,237 @@
   <title>World Cup Draft Scoreboard</title>
 
   <style>
+   <style>
+  body {
+    font-family: "Trebuchet MS", "Comic Sans MS", Arial, sans-serif;
+    background:
+      radial-gradient(circle at top left, rgba(255,255,255,0.06), transparent 28%),
+      radial-gradient(circle at bottom right, rgba(255,255,255,0.04), transparent 30%),
+      #21402f;
+    color: #f6f1df;
+    margin: 0;
+    padding: 24px;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
+    background-size: 36px 36px;
+    opacity: 0.35;
+  }
+
+  .container {
+    max-width: 1150px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 2.6rem;
+    letter-spacing: 1px;
+    color: #fff8dc;
+    text-shadow: 0 0 2px rgba(255,255,255,0.7);
+    margin-bottom: 10px;
+  }
+
+  h2 {
+    text-align: center;
+    color: #fff8dc;
+    letter-spacing: 0.5px;
+    text-shadow: 0 0 1px rgba(255,255,255,0.5);
+  }
+
+  .nav {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  .nav a {
+    color: #f3d36b;
+    font-weight: bold;
+    text-decoration: none;
+    border-bottom: 2px dashed rgba(243, 211, 107, 0.75);
+    padding-bottom: 3px;
+  }
+
+  .nav a:hover {
+    color: #ffe58a;
+  }
+
+  .card {
+    background:
+      linear-gradient(135deg, rgba(255,255,255,0.055), rgba(255,255,255,0.015)),
+      #244b36;
+    border: 2px solid rgba(246, 241, 223, 0.55);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 24px;
+    box-shadow:
+      inset 0 0 18px rgba(0,0,0,0.28),
+      0 8px 22px rgba(0,0,0,0.28);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+  }
+
+  th, td {
+    padding: 12px;
+    border-bottom: 2px dashed rgba(246, 241, 223, 0.32);
+    text-align: left;
+    vertical-align: top;
+  }
+
+  th {
+    background: rgba(255,255,255,0.06);
+    color: #f3d36b;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+
+  .rank {
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: #f3d36b;
+  }
+
+  .score {
+    font-weight: bold;
+    font-size: 1.25rem;
+    color: #fff8dc;
+  }
+
+  .small {
+    opacity: 0.9;
+    font-size: 0.9rem;
+    color: #eee6c8;
+  }
+
+  .warning {
+    color: #ffdf70;
+    font-weight: bold;
+  }
+
+  .pill {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 999px;
+    border: 1.5px solid rgba(246, 241, 223, 0.55);
+    background: rgba(255,255,255,0.06);
+    margin: 2px;
+    font-size: 0.85rem;
+    color: #fff8dc;
+    white-space: nowrap;
+    box-shadow: inset 0 0 8px rgba(255,255,255,0.04);
+  }
+
+  .first-place {
+    background: rgba(243, 211, 107, 0.13);
+  }
+
+  button {
+    background: transparent;
+    color: #fff8dc;
+    border: 2px solid rgba(246, 241, 223, 0.7);
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: inset 0 0 8px rgba(255,255,255,0.08);
+  }
+
+  button:hover {
+    background: rgba(255,255,255,0.08);
+  }
+
+  .mobile-leaderboard {
+    display: none;
+  }
+
+  .mobile-player-card {
+    background:
+      linear-gradient(135deg, rgba(255,255,255,0.055), rgba(255,255,255,0.015)),
+      #244b36;
+    border: 2px solid rgba(246, 241, 223, 0.55);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 14px;
+    box-shadow:
+      inset 0 0 18px rgba(0,0,0,0.28),
+      0 8px 22px rgba(0,0,0,0.28);
+  }
+
+  .mobile-player-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .mobile-rank {
+    color: #f3d36b;
+    font-weight: bold;
+    font-size: 1.1rem;
+  }
+
+  .mobile-total {
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: #fff8dc;
+  }
+
+  @media (max-width: 800px) {
     body {
-      font-family: Arial, sans-serif;
-      background: #071e3d;
-      color: white;
-      margin: 0;
-      padding: 24px;
-    }
-
-    .container {
-      max-width: 1150px;
-      margin: 0 auto;
-    }
-
-    h1, h2 {
-      text-align: center;
-    }
-
-    .nav {
-      text-align: center;
-      margin-bottom: 24px;
-    }
-
-    .nav a {
-      color: #f7c948;
-      font-weight: bold;
-      text-decoration: none;
-    }
-
-    .card {
-      background: #12345f;
-      border-radius: 14px;
-      padding: 20px;
-      margin-bottom: 24px;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.25);
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 16px;
-    }
-
-    th, td {
       padding: 12px;
-      border-bottom: 1px solid #2f5688;
-      text-align: left;
-      vertical-align: top;
     }
 
-    th {
-      background: #1a4275;
+    h1 {
+      font-size: 1.9rem;
+      line-height: 1.15;
     }
 
-    .rank {
-      font-weight: bold;
-      font-size: 1.2rem;
-    }
-
-    .score {
-      font-weight: bold;
-      font-size: 1.25rem;
-    }
-
-    .small {
-      opacity: 0.85;
-      font-size: 0.9rem;
-    }
-
-    .warning {
-      color: #ffd966;
-      font-weight: bold;
-    }
-
-    .pill {
-      display: inline-block;
-      padding: 5px 9px;
-      border-radius: 999px;
-      background: #1a4275;
-      margin: 2px;
-      font-size: 0.85rem;
-      white-space: nowrap;
-    }
-
-    .first-place {
-      background: rgba(247, 201, 72, 0.16);
-    }
-
-    button {
-      background: #f7c948;
-      color: #071e3d;
-      border: none;
-      padding: 10px 14px;
-      border-radius: 8px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: #ffda6a;
-    }
-
-    .mobile-leaderboard {
+    .desktop-leaderboard {
       display: none;
     }
 
-    .mobile-player-card {
-      background: #12345f;
-      border-radius: 14px;
-      padding: 16px;
-      margin-bottom: 14px;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+    .mobile-leaderboard {
+      display: block;
     }
 
-    .mobile-player-header {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      align-items: center;
-      margin-bottom: 10px;
+    .nation-score-table-wrapper {
+      overflow-x: auto;
     }
 
-    .mobile-rank {
-      color: #f7c948;
-      font-weight: bold;
-      font-size: 1.1rem;
+    table {
+      font-size: 0.85rem;
     }
 
-    .mobile-total {
-      font-weight: bold;
-      font-size: 1.2rem;
+    th, td {
+      padding: 8px;
     }
 
-    @media (max-width: 800px) {
-      body {
-        padding: 12px;
-      }
-
-      h1 {
-        font-size: 1.6rem;
-      }
-
-      .desktop-leaderboard {
-        display: none;
-      }
-
-      .mobile-leaderboard {
-        display: block;
-      }
-
-      .nation-score-table-wrapper {
-        overflow-x: auto;
-      }
-
-      table {
-        font-size: 0.85rem;
-      }
-
-      th, td {
-        padding: 8px;
-      }
-
-      .card {
-        padding: 14px;
-      }
-
-      button {
-        width: 100%;
-        padding: 12px;
-        font-size: 1rem;
-      }
+    .card {
+      padding: 14px;
     }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      font-size: 1rem;
+    }
+  }
+</style>
   </style>
 </head>
 <body>
