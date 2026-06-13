@@ -47,8 +47,12 @@ const scoringRules = {
   qf: 3,
   sf: 4,
   third: 4,
-  final: 5
+  final: 5,
+  missedKnockoutPenalty: -2
 };
+
+const STARTING_GROUP_POINTS_REMAINING = 48;
+const GROUP_POINTS_USED_PER_MATCH = 3;
 
 const nationAliases = {
   USA: "United States",
@@ -247,10 +251,12 @@ function createEmptyNationScore() {
     sf: 0,
     third: 0,
     final: 0,
+    missedKnockout: 0,
+    groupMatchesPlayed: 0,
+    knockoutAppearances: 0,
     matches: []
   };
 }
-
 function ensureNation(scores, nation) {
   const normalized = normalizeNation(nation);
 
@@ -261,17 +267,14 @@ function ensureNation(scores, nation) {
   return normalized;
 }
 
-function addNationPoints(scores, nation, points, stage, matchLabel) {
+function recordGroupMatchPlayed(scores, nation) {
   const normalized = ensureNation(scores, nation);
+  scores[normalized].groupMatchesPlayed += 1;
+}
 
-  scores[normalized].total += points;
-  scores[normalized][stage] += points;
-
-  scores[normalized].matches.push({
-    match: matchLabel,
-    stage,
-    points
-  });
+function recordKnockoutAppearance(scores, nation) {
+  const normalized = ensureNation(scores, nation);
+  scores[normalized].knockoutAppearances += 1;
 }
 
 function detectStage(event) {
@@ -365,46 +368,30 @@ function parseMatch(event) {
   };
 }
 
-function scoreCompletedEvent(event, nationScores) {
-  if (!isCompleted(event)) {
+function applyMissedKnockoutPenalties(nationScores) {
+  const knockoutHasStartedOrBracketExists = Object.values(nationScores).some(score => {
+    return score.knockoutAppearances > 0;
+  });
+
+  if (!knockoutHasStartedOrBracketExists) {
     return;
   }
 
-  const stage = detectStage(event);
-  const match = parseMatch(event);
+  Object.entries(nationScores).forEach(([nation, score]) => {
+    const completedGroupStage = score.groupMatchesPlayed >= 3;
+    const madeKnockoutStage = score.knockoutAppearances > 0;
+    const alreadyPenalized = score.missedKnockout < 0;
 
-  if (!match) {
-    return;
-  }
-
-  const matchLabel = event.name || event.shortName || "Unknown match";
-
-  if (stage === "group") {
-    if (match.teamAScore > match.teamBScore) {
-      addNationPoints(nationScores, match.teamAName, 3, "group", matchLabel);
-      addNationPoints(nationScores, match.teamBName, 0, "group", matchLabel);
-    } else if (match.teamBScore > match.teamAScore) {
-      addNationPoints(nationScores, match.teamBName, 3, "group", matchLabel);
-      addNationPoints(nationScores, match.teamAName, 0, "group", matchLabel);
-    } else {
-      addNationPoints(nationScores, match.teamAName, 1, "group", matchLabel);
-      addNationPoints(nationScores, match.teamBName, 1, "group", matchLabel);
+    if (completedGroupStage && !madeKnockoutStage && !alreadyPenalized) {
+      addNationPoints(
+        nationScores,
+        nation,
+        scoringRules.missedKnockoutPenalty,
+        "missedKnockout",
+        "Did not make knockout stage"
+      );
     }
-
-    return;
-  }
-
-  if (!match.winner) {
-    return;
-  }
-
-  addNationPoints(
-    nationScores,
-    match.winner,
-    scoringRules[stage],
-    stage,
-    matchLabel
-  );
+  });
 }
 
 function buildLeaderboard(nationScores, draftBoard) {
@@ -414,18 +401,37 @@ function buildLeaderboard(nationScores, draftBoard) {
 
       const nationBreakdown = nations.map(nation => ({
         nation,
-        score: nationScores[nation]?.total || 0
+        score: nationScores[nation]?.total || 0,
+        group: nationScores[nation]?.group || 0,
+        r32: nationScores[nation]?.r32 || 0,
+        r16: nationScores[nation]?.r16 || 0,
+        qf: nationScores[nation]?.qf || 0,
+        sf: nationScores[nation]?.sf || 0,
+        third: nationScores[nation]?.third || 0,
+        final: nationScores[nation]?.final || 0,
+        missedKnockout: nationScores[nation]?.missedKnockout || 0,
+        groupMatchesPlayed: nationScores[nation]?.groupMatchesPlayed || 0
       }));
 
       const total = nationBreakdown.reduce((sum, item) => {
         return sum + item.score;
       }, 0);
 
+      const groupGamesPlayed = nationBreakdown.reduce((sum, item) => {
+        return sum + item.groupMatchesPlayed;
+      }, 0);
+
+      const groupPointsRemaining =
+        STARTING_GROUP_POINTS_REMAINING -
+        groupGamesPlayed * GROUP_POINTS_USED_PER_MATCH;
+
       return {
         player: entry.player,
         nations,
         nationBreakdown,
-        total
+        total,
+        groupGamesPlayed,
+        groupPointsRemaining
       };
     })
     .sort((a, b) => b.total - a.total);
@@ -456,11 +462,13 @@ function calculateScores(espnData, draftBoard) {
     entry.nations.forEach(nation => ensureNation(nationScores, nation));
   });
 
-  events.forEach(event => {
-    scoreCompletedEvent(event, nationScores);
-  });
+events.forEach(event => {
+  scoreCompletedEvent(event, nationScores);
+});
 
-  return {
+applyMissedKnockoutPenalties(nationScores);
+
+return {
     updatedAt: new Date().toISOString(),
     source: "ESPN + Google Sheets",
     tournamentDates: TOURNAMENT_DATES,
