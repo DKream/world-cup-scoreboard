@@ -7,251 +7,341 @@
   <title>World Cup Draft Scoreboard</title>
 
   <style>
-   <style>
-  body {
-    font-family: "Trebuchet MS", "Comic Sans MS", Arial, sans-serif;
-    background:
-      radial-gradient(circle at top left, rgba(255,255,255,0.06), transparent 28%),
-      radial-gradient(circle at bottom right, rgba(255,255,255,0.04), transparent 30%),
-      #21402f;
-    color: #f6f1df;
-    margin: 0;
-    padding: 24px;
-  }
+    :root {
+      --bg: #070b14;
+      --card: #101827;
+      --card-2: #151f32;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --line: rgba(148, 163, 184, 0.22);
+      --accent: #38bdf8;
+      --accent-2: #facc15;
+      --good: #22c55e;
+      --bad: #ef4444;
+    }
 
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    background-image:
-      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
-    background-size: 36px 36px;
-    opacity: 0.35;
-  }
+    * {
+      box-sizing: border-box;
+    }
 
-  .container {
-    max-width: 1150px;
-    margin: 0 auto;
-    position: relative;
-    z-index: 1;
-  }
-
-  h1 {
-    text-align: center;
-    font-size: 2.6rem;
-    letter-spacing: 1px;
-    color: #fff8dc;
-    text-shadow: 0 0 2px rgba(255,255,255,0.7);
-    margin-bottom: 10px;
-  }
-
-  h2 {
-    text-align: center;
-    color: #fff8dc;
-    letter-spacing: 0.5px;
-    text-shadow: 0 0 1px rgba(255,255,255,0.5);
-  }
-
-  .nav {
-    text-align: center;
-    margin-bottom: 24px;
-  }
-
-  .nav a {
-    color: #f3d36b;
-    font-weight: bold;
-    text-decoration: none;
-    border-bottom: 2px dashed rgba(243, 211, 107, 0.75);
-    padding-bottom: 3px;
-  }
-
-  .nav a:hover {
-    color: #ffe58a;
-  }
-
-  .card {
-    background:
-      linear-gradient(135deg, rgba(255,255,255,0.055), rgba(255,255,255,0.015)),
-      #244b36;
-    border: 2px solid rgba(246, 241, 223, 0.55);
-    border-radius: 10px;
-    padding: 20px;
-    margin-bottom: 24px;
-    box-shadow:
-      inset 0 0 18px rgba(0,0,0,0.28),
-      0 8px 22px rgba(0,0,0,0.28);
-  }
-
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 16px;
-  }
-
-  th, td {
-    padding: 12px;
-    border-bottom: 2px dashed rgba(246, 241, 223, 0.32);
-    text-align: left;
-    vertical-align: top;
-  }
-
-  th {
-    background: rgba(255,255,255,0.06);
-    color: #f3d36b;
-    font-size: 0.95rem;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-  }
-
-  .rank {
-    font-weight: bold;
-    font-size: 1.2rem;
-    color: #f3d36b;
-  }
-
-  .score {
-    font-weight: bold;
-    font-size: 1.25rem;
-    color: #fff8dc;
-  }
-
-  .small {
-    opacity: 0.9;
-    font-size: 0.9rem;
-    color: #eee6c8;
-  }
-
-  .warning {
-    color: #ffdf70;
-    font-weight: bold;
-  }
-
-  .pill {
-    display: inline-block;
-    padding: 5px 10px;
-    border-radius: 999px;
-    border: 1.5px solid rgba(246, 241, 223, 0.55);
-    background: rgba(255,255,255,0.06);
-    margin: 2px;
-    font-size: 0.85rem;
-    color: #fff8dc;
-    white-space: nowrap;
-    box-shadow: inset 0 0 8px rgba(255,255,255,0.04);
-  }
-
-  .first-place {
-    background: rgba(243, 211, 107, 0.13);
-  }
-
-  button {
-    background: transparent;
-    color: #fff8dc;
-    border: 2px solid rgba(246, 241, 223, 0.7);
-    padding: 10px 14px;
-    border-radius: 8px;
-    font-weight: bold;
-    cursor: pointer;
-    box-shadow: inset 0 0 8px rgba(255,255,255,0.08);
-  }
-
-  button:hover {
-    background: rgba(255,255,255,0.08);
-  }
-
-  .mobile-leaderboard {
-    display: none;
-  }
-
-  .mobile-player-card {
-    background:
-      linear-gradient(135deg, rgba(255,255,255,0.055), rgba(255,255,255,0.015)),
-      #244b36;
-    border: 2px solid rgba(246, 241, 223, 0.55);
-    border-radius: 10px;
-    padding: 16px;
-    margin-bottom: 14px;
-    box-shadow:
-      inset 0 0 18px rgba(0,0,0,0.28),
-      0 8px 22px rgba(0,0,0,0.28);
-  }
-
-  .mobile-player-header {
-    display: flex;
-    justify-content: space-between;
-    gap: 12px;
-    align-items: center;
-    margin-bottom: 10px;
-  }
-
-  .mobile-rank {
-    color: #f3d36b;
-    font-weight: bold;
-    font-size: 1.1rem;
-  }
-
-  .mobile-total {
-    font-weight: bold;
-    font-size: 1.2rem;
-    color: #fff8dc;
-  }
-
-  @media (max-width: 800px) {
     body {
-      padding: 12px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(56, 189, 248, 0.18), transparent 28%),
+        radial-gradient(circle at top right, rgba(250, 204, 21, 0.12), transparent 24%),
+        linear-gradient(180deg, #070b14 0%, #0b1120 100%);
+      color: var(--text);
+      margin: 0;
+      padding: 24px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+
+    .hero {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      align-items: flex-end;
+      margin-bottom: 24px;
+    }
+
+    .eyebrow {
+      color: var(--accent);
+      font-size: 0.8rem;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
     }
 
     h1 {
-      font-size: 1.9rem;
-      line-height: 1.15;
+      font-size: clamp(2rem, 5vw, 4rem);
+      line-height: 0.95;
+      margin: 0;
+      letter-spacing: -0.06em;
     }
 
-    .desktop-leaderboard {
-      display: none;
+    .hero-subtitle {
+      color: var(--muted);
+      margin-top: 12px;
+      max-width: 650px;
+    }
+
+    .nav a {
+      color: var(--bg);
+      background: var(--accent-2);
+      font-weight: 800;
+      text-decoration: none;
+      padding: 12px 16px;
+      border-radius: 999px;
+      display: inline-block;
+      white-space: nowrap;
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.055), rgba(255,255,255,0.025)), var(--card);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 20px;
+      margin-bottom: 22px;
+      box-shadow: 0 18px 45px rgba(0,0,0,0.28);
+      backdrop-filter: blur(10px);
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+    }
+
+    button {
+      background: linear-gradient(135deg, var(--accent), #60a5fa);
+      color: #03101f;
+      border: none;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    button:hover {
+      filter: brightness(1.08);
+    }
+
+    .small {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin: 0;
+    }
+
+    .warning {
+      color: var(--accent-2);
+      font-weight: 800;
+      margin-top: 8px;
+    }
+
+    h2 {
+      margin-top: 0;
+      margin-bottom: 14px;
+      letter-spacing: -0.03em;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 14px 12px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 900;
+    }
+
+    tbody tr:hover {
+      background: rgba(255,255,255,0.035);
+    }
+
+    .rank-badge {
+      width: 34px;
+      height: 34px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: var(--card-2);
+      border: 1px solid var(--line);
+      font-weight: 900;
+      color: var(--accent-2);
+    }
+
+    .player-name {
+      font-weight: 900;
+      font-size: 1rem;
+    }
+
+    .score {
+      font-weight: 950;
+      font-size: 1.45rem;
+      letter-spacing: -0.04em;
+    }
+
+    .remaining {
+      font-weight: 900;
+      color: var(--accent);
+      font-size: 1.1rem;
+    }
+
+    .flags {
+      display: flex;
+      gap: 7px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .flag-icon {
+      width: 34px;
+      height: 24px;
+      object-fit: cover;
+      border-radius: 5px;
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.18),
+        0 5px 12px rgba(0,0,0,0.25);
+      background: rgba(255,255,255,0.08);
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid var(--line);
+      margin: 3px;
+      font-size: 0.82rem;
+      white-space: nowrap;
+      color: var(--text);
+    }
+
+    .penalty {
+      color: var(--bad);
+      font-weight: 800;
+    }
+
+    .first-place {
+      background: rgba(250, 204, 21, 0.08);
     }
 
     .mobile-leaderboard {
-      display: block;
+      display: none;
+    }
+
+    .mobile-player-card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.055), rgba(255,255,255,0.025)), var(--card);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 18px 45px rgba(0,0,0,0.24);
+    }
+
+    .mobile-player-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .mobile-total {
+      font-weight: 950;
+      font-size: 1.5rem;
+      letter-spacing: -0.05em;
+    }
+
+    .mobile-meta {
+      color: var(--muted);
+      font-size: 0.82rem;
+      margin-top: 2px;
     }
 
     .nation-score-table-wrapper {
       overflow-x: auto;
     }
 
-    table {
-      font-size: 0.85rem;
-    }
+    @media (max-width: 800px) {
+      body {
+        padding: 14px;
+      }
 
-    th, td {
-      padding: 8px;
-    }
+      .hero {
+        flex-direction: column;
+        align-items: flex-start;
+      }
 
-    .card {
-      padding: 14px;
-    }
+      .nav a {
+        width: 100%;
+        text-align: center;
+      }
 
-    button {
-      width: 100%;
-      padding: 12px;
-      font-size: 1rem;
+      .toolbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      button {
+        width: 100%;
+        font-size: 1rem;
+      }
+
+      .desktop-leaderboard {
+        display: none;
+      }
+
+      .mobile-leaderboard {
+        display: block;
+      }
+
+      .card {
+        padding: 14px;
+        border-radius: 18px;
+      }
+
+      table {
+        font-size: 0.84rem;
+        min-width: 760px;
+      }
+
+      th, td {
+        padding: 10px 8px;
+      }
+
+      .flag-icon {
+        width: 31px;
+        height: 22px;
+      }
     }
-  }
-</style>
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>World Cup Draft Scoreboard</h1>
+    <section class="hero">
+      <div>
+        <div class="eyebrow">World Cup Draft Game</div>
+        <h1>Live Scoreboard</h1>
+        <p class="hero-subtitle">
+          Automatic standings, remaining group-stage upside, and country-by-country scoring.
+        </p>
+      </div>
 
-    <div class="nav">
-      <a href="/team-assignments.html">View Team Assignments</a>
-    </div>
+      <div class="nav">
+        <a href="/team-assignments.html">Team Assignments</a>
+      </div>
+    </section>
 
     <div class="card">
-      <button onclick="loadScores()">Refresh Now</button>
-      <p class="small" id="status">Loading scoreboard...</p>
-      <p class="small warning" id="warning"></p>
+      <div class="toolbar">
+        <div>
+          <p class="small" id="status">Loading scoreboard...</p>
+          <p class="small warning" id="warning"></p>
+        </div>
+        <button onclick="loadScores()">Refresh Now</button>
+      </div>
     </div>
 
     <div class="card desktop-leaderboard">
@@ -260,10 +350,11 @@
         <thead>
           <tr>
             <th>Rank</th>
-            <th>Player</th>
-            <th>Drafted Nations</th>
+            <th>Contestant</th>
+            <th>Draft Nations</th>
+            <th>Total Score</th>
+            <th>Group Points Remaining</th>
             <th>Breakdown</th>
-            <th>Total</th>
           </tr>
         </thead>
         <tbody id="leaderboard"></tbody>
@@ -289,6 +380,7 @@
               <th>SF</th>
               <th>3rd</th>
               <th>Final</th>
+              <th>Missed KO</th>
               <th>Total</th>
             </tr>
           </thead>
@@ -299,6 +391,71 @@
   </div>
 
   <script>
+    const teamFlagCodes = {
+      "Argentina": "ar",
+      "Algeria": "dz",
+      "Australia": "au",
+      "Austria": "at",
+      "Bosnia and Herzegovina": "ba",
+      "Belgium": "be",
+      "Brazil": "br",
+      "Cabo Verde": "cv",
+      "Cameroon": "cm",
+      "Canada": "ca",
+      "Chile": "cl",
+      "Colombia": "co",
+      "Congo DR": "cd",
+      "Costa Rica": "cr",
+      "Croatia": "hr",
+      "Curacao": "cw",
+      "Czechia": "cz",
+      "Denmark": "dk",
+      "Ecuador": "ec",
+      "Egypt": "eg",
+      "England": "gb-eng",
+      "France": "fr",
+      "Germany": "de",
+      "Ghana": "gh",
+      "Haiti": "ht",
+      "Iran": "ir",
+      "Iraq": "iq",
+      "Italy": "it",
+      "Ivory Coast": "ci",
+      "Japan": "jp",
+      "Jordan": "jo",
+      "Mexico": "mx",
+      "Morocco": "ma",
+      "Netherlands": "nl",
+      "New Zealand": "nz",
+      "Nigeria": "ng",
+      "Norway": "no",
+      "Panama": "pa",
+      "Paraguay": "py",
+      "Peru": "pe",
+      "Poland": "pl",
+      "Portugal": "pt",
+      "Qatar": "qa",
+      "Saudi Arabia": "sa",
+      "Scotland": "gb-sct",
+      "Senegal": "sn",
+      "Serbia": "rs",
+      "South Africa": "za",
+      "South Korea": "kr",
+      "Spain": "es",
+      "Sweden": "se",
+      "Switzerland": "ch",
+      "Tunisia": "tn",
+      "Turkiye": "tr",
+      "Türkiye": "tr",
+      "Turkey": "tr",
+      "Ukraine": "ua",
+      "United States": "us",
+      "USA": "us",
+      "Uruguay": "uy",
+      "Uzbekistan": "uz",
+      "Wales": "gb-wls"
+    };
+
     function escapeHtml(value) {
       return String(value)
         .replaceAll("&", "&amp;")
@@ -306,6 +463,55 @@
         .replaceAll(">", "&gt;")
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;");
+    }
+
+    function getFlagUrl(teamName) {
+      const code = teamFlagCodes[teamName];
+
+      if (!code) {
+        return null;
+      }
+
+      return `https://flagcdn.com/w40/${code}.png`;
+    }
+
+    function renderFlag(teamName) {
+      const safeTeamName = escapeHtml(teamName);
+      const flagUrl = getFlagUrl(teamName);
+
+      if (!flagUrl) {
+        return `<span class="pill">${safeTeamName}</span>`;
+      }
+
+      return `
+        <img
+          class="flag-icon"
+          src="${flagUrl}"
+          alt="${safeTeamName} flag"
+          title="${safeTeamName}"
+          loading="lazy"
+        />
+      `;
+    }
+
+    function renderFlagGroup(nations) {
+      return `
+        <div class="flags">
+          ${nations.map(renderFlag).join("")}
+        </div>
+      `;
+    }
+
+    function renderBreakdown(entry) {
+      return entry.nationBreakdown
+        .map(item => {
+          const penalty = item.missedKnockout < 0
+            ? ` <span class="penalty">(${item.missedKnockout})</span>`
+            : "";
+
+          return `<span class="pill">${escapeHtml(item.nation)}: ${item.score}${penalty}</span>`;
+        })
+        .join("");
     }
 
     async function loadScores() {
@@ -347,16 +553,13 @@
             row.className = "first-place";
           }
 
-          const breakdown = entry.nationBreakdown
-            .map(item => `<span class="pill">${escapeHtml(item.nation)}: ${item.score}</span>`)
-            .join("");
-
           row.innerHTML = `
-            <td class="rank">${index + 1}</td>
-            <td>${escapeHtml(entry.player)}</td>
-            <td>${entry.nations.map(escapeHtml).join(", ")}</td>
-            <td>${breakdown}</td>
+            <td><span class="rank-badge">${index + 1}</span></td>
+            <td><div class="player-name">${escapeHtml(entry.player)}</div></td>
+            <td>${renderFlagGroup(entry.nations)}</td>
             <td class="score">${entry.total}</td>
+            <td class="remaining">${entry.groupPointsRemaining}</td>
+            <td>${renderBreakdown(entry)}</td>
           `;
 
           leaderboard.appendChild(row);
@@ -367,17 +570,17 @@
           mobileCard.innerHTML = `
             <div class="mobile-player-header">
               <div>
-                <div class="mobile-rank">#${index + 1}</div>
-                <strong>${escapeHtml(entry.player)}</strong>
+                <span class="rank-badge">${index + 1}</span>
+                <div class="player-name" style="margin-top: 8px;">${escapeHtml(entry.player)}</div>
+                <div class="mobile-meta">Group remaining: ${entry.groupPointsRemaining}</div>
               </div>
               <div class="mobile-total">${entry.total} pts</div>
             </div>
 
-            <div class="small">Drafted Nations</div>
-            <div>${entry.nations.map(nation => `<span class="pill">${escapeHtml(nation)}</span>`).join("")}</div>
+            ${renderFlagGroup(entry.nations)}
 
-            <div class="small" style="margin-top: 10px;">Breakdown</div>
-            <div>${breakdown}</div>
+            <div class="mobile-meta" style="margin-top: 12px;">Breakdown</div>
+            <div>${renderBreakdown(entry)}</div>
           `;
 
           mobileLeaderboard.appendChild(mobileCard);
@@ -397,6 +600,7 @@
               <td>${score.sf || 0}</td>
               <td>${score.third || 0}</td>
               <td>${score.final || 0}</td>
+              <td class="penalty">${score.missedKnockout || 0}</td>
               <td class="score">${score.total || 0}</td>
             `;
 
