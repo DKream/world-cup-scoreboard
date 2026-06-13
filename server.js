@@ -266,6 +266,18 @@ function ensureNation(scores, nation) {
 
   return normalized;
 }
+function addNationPoints(scores, nation, points, stage, matchLabel) {
+  const normalized = ensureNation(scores, nation);
+
+  scores[normalized].total += points;
+  scores[normalized][stage] += points;
+
+  scores[normalized].matches.push({
+    match: matchLabel,
+    stage,
+    points
+  });
+}
 
 function recordGroupMatchPlayed(scores, nation) {
   const normalized = ensureNation(scores, nation);
@@ -345,6 +357,53 @@ function parseMatch(event) {
     return null;
   }
 
+function scoreCompletedEvent(event, nationScores) {
+  if (!isCompleted(event)) {
+    return;
+  }
+
+  const stage = detectStage(event);
+  const match = parseMatch(event);
+
+  if (!match) {
+    return;
+  }
+
+  const matchLabel = event.name || event.shortName || "Unknown match";
+
+  if (stage === "group") {
+    recordGroupMatchPlayed(nationScores, match.teamAName);
+    recordGroupMatchPlayed(nationScores, match.teamBName);
+
+    if (match.teamAScore > match.teamBScore) {
+      addNationPoints(nationScores, match.teamAName, 3, "group", matchLabel);
+      addNationPoints(nationScores, match.teamBName, 0, "group", matchLabel);
+    } else if (match.teamBScore > match.teamAScore) {
+      addNationPoints(nationScores, match.teamBName, 3, "group", matchLabel);
+      addNationPoints(nationScores, match.teamAName, 0, "group", matchLabel);
+    } else {
+      addNationPoints(nationScores, match.teamAName, 1, "group", matchLabel);
+      addNationPoints(nationScores, match.teamBName, 1, "group", matchLabel);
+    }
+
+    return;
+  }
+
+  recordKnockoutAppearance(nationScores, match.teamAName);
+  recordKnockoutAppearance(nationScores, match.teamBName);
+
+  if (!match.winner) {
+    return;
+  }
+
+  addNationPoints(
+    nationScores,
+    match.winner,
+    scoringRules[stage],
+    stage,
+    matchLabel
+  );
+}
   const teamA = competitors[0];
   const teamB = competitors[1];
 
