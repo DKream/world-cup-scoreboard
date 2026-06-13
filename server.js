@@ -266,6 +266,7 @@ function ensureNation(scores, nation) {
 
   return normalized;
 }
+
 function addNationPoints(scores, nation, points, stage, matchLabel) {
   const normalized = ensureNation(scores, nation);
 
@@ -357,6 +358,29 @@ function parseMatch(event) {
     return null;
   }
 
+  const teamA = competitors[0];
+  const teamB = competitors[1];
+
+  const teamAName = getTeamName(teamA);
+  const teamBName = getTeamName(teamB);
+
+  const teamAScore = Number(teamA.score);
+  const teamBScore = Number(teamB.score);
+
+  const winner =
+    teamA.winner === true ? teamAName :
+    teamB.winner === true ? teamBName :
+    null;
+
+  return {
+    teamAName,
+    teamBName,
+    teamAScore,
+    teamBScore,
+    winner
+  };
+}
+
 function scoreCompletedEvent(event, nationScores) {
   if (!isCompleted(event)) {
     return;
@@ -403,28 +427,6 @@ function scoreCompletedEvent(event, nationScores) {
     stage,
     matchLabel
   );
-}
-  const teamA = competitors[0];
-  const teamB = competitors[1];
-
-  const teamAName = getTeamName(teamA);
-  const teamBName = getTeamName(teamB);
-
-  const teamAScore = Number(teamA.score);
-  const teamBScore = Number(teamB.score);
-
-  const winner =
-    teamA.winner === true ? teamAName :
-    teamB.winner === true ? teamBName :
-    null;
-
-  return {
-    teamAName,
-    teamBName,
-    teamAScore,
-    teamBScore,
-    winner
-  };
 }
 
 function applyMissedKnockoutPenalties(nationScores) {
