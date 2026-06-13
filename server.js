@@ -59,6 +59,11 @@ const nationAliases = {
   "United States": "United States",
   "United States of America": "United States",
 
+  "Bosnia & Herzegovina": "Bosnia and Herzegovina",
+"Bosnia and Herzegovina": "Bosnia and Herzegovina",
+"Bosnia-Herzegovina": "Bosnia and Herzegovina",
+"BIH": "Bosnia and Herzegovina",
+
   "Korea Republic": "South Korea",
   Korea: "South Korea",
   "South Korea": "South Korea",
