@@ -64,6 +64,14 @@ const nationAliases = {
 "Bosnia-Herzegovina": "Bosnia and Herzegovina",
 "BIH": "Bosnia and Herzegovina",
 
+    "Cabo Verde": "Cape Verde",
+  "Cape Verde": "Cape Verde",
+  CPV: "Cape Verde",
+
+  "Curaçao": "Curacao",
+  Curacao: "Curacao",
+  CUW: "Curacao",
+
   "Korea Republic": "South Korea",
   Korea: "South Korea",
   "South Korea": "South Korea",
@@ -72,10 +80,8 @@ const nationAliases = {
   Iran: "Iran",
 
   England: "England",
-  Curaçao: "Curaçao", "Curacao"
   Argentina: "Argentina",
   Brazil: "Brazil",
-  Cape Verde: "Cape Verde", "Cabo Verde",
   France: "France",
   Spain: "Spain",
   Germany: "Germany",
