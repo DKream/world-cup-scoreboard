@@ -51,7 +51,7 @@ const scoringRules = {
   missedKnockoutPenalty: -2
 };
 
-const STARTING_GROUP_POINTS_REMAINING = 48;
+const STARTING_GROUP_POINTS_REMAINING = 36;
 const GROUP_POINTS_USED_PER_MATCH = 3;
 
 const nationAliases = {
