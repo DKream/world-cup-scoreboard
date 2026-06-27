@@ -79,6 +79,11 @@ const nationAliases = {
   "IR Iran": "Iran",
   Iran: "Iran",
 
+    Turkey: "Turkey",
+  Turkiye: "Turkey",
+  "Türkiye": "Turkey",
+  TUR: "Turkey",
+
   England: "England",
   Argentina: "Argentina",
   Brazil: "Brazil",
