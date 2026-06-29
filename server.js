@@ -418,18 +418,31 @@ function isRealNationName(name) {
     return false;
   }
 
+  if (value.includes("3rd group")) {
+    return false;
+  }
+
   return true;
+}
+
+function isKnockoutEvent(event) {
+  const stage = detectStage(event);
+  const eventDate = event.date ? String(event.date).slice(0, 10) : "";
+
+  if (stage !== "group") {
+    return true;
+  }
+
+  if (eventDate >= "2026-06-28") {
+    return true;
+  }
+
+  return false;
 }
 
 function markKnockoutQualifiersFromEvents(events, nationScores) {
   events.forEach(event => {
-    const stage = detectStage(event);
-
-    if (stage === "group") {
-      return;
-    }
-
-    if (!scoringRules[stage]) {
+    if (!isKnockoutEvent(event)) {
       return;
     }
 
@@ -459,7 +472,7 @@ function scoreCompletedEvent(event, nationScores) {
 
   const matchLabel = event.name || event.shortName || "Unknown match";
 
-  if (stage === "group") {
+  if (stage === "group" && !isKnockoutEvent(event)) {
     if (!isCompleted(event)) {
       return;
     }
@@ -481,10 +494,6 @@ function scoreCompletedEvent(event, nationScores) {
     return;
   }
 
-  if (!scoringRules[stage]) {
-    return;
-  }
-
   if (!isCompleted(event)) {
     return;
   }
@@ -493,11 +502,17 @@ function scoreCompletedEvent(event, nationScores) {
     return;
   }
 
+  const knockoutStage = stage === "group" ? "r32" : stage;
+
+  if (!scoringRules[knockoutStage]) {
+    return;
+  }
+
   addNationPoints(
     nationScores,
     match.winner,
-    scoringRules[stage],
-    stage,
+    scoringRules[knockoutStage],
+    knockoutStage,
     matchLabel
   );
 }
