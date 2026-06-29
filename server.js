@@ -272,6 +272,7 @@ function createEmptyNationScore() {
     missedKnockout: 0,
     groupMatchesPlayed: 0,
     knockoutAppearances: 0,
+    pointsPossibleRemaining: 0,
     matches: []
   };
 }
@@ -517,6 +518,107 @@ function scoreCompletedEvent(event, nationScores) {
   );
 }
 
+function getLoserFromMatch(match) {
+  if (!match.winner) {
+    return null;
+  }
+
+  if (match.winner === match.teamAName) {
+    return match.teamBName;
+  }
+
+  if (match.winner === match.teamBName) {
+    return match.teamAName;
+  }
+
+  return null;
+}
+
+function getPointsPossibleFromStage(stage) {
+  const possibleByStage = {
+    r32: 18,
+    r16: 15,
+    qf: 12,
+    sf: 9,
+    third: 4,
+    final: 5
+  };
+
+  return possibleByStage[stage] || 0;
+}
+
+function getPointsPossibleAfterWin(stage) {
+  const possibleAfterWin = {
+    r32: 15,
+    r16: 12,
+    qf: 9,
+    sf: 5,
+    third: 0,
+    final: 0
+  };
+
+  return possibleAfterWin[stage] || 0;
+}
+
+function setNationPointsPossible(nationScores, nation, pointsPossible) {
+  if (!isRealNationName(nation)) {
+    return;
+  }
+
+  const normalized = ensureNation(nationScores, nation);
+
+  nationScores[normalized].pointsPossibleRemaining = Math.max(
+    nationScores[normalized].pointsPossibleRemaining || 0,
+    pointsPossible
+  );
+}
+
+function calculatePointsPossibleRemaining(events, nationScores) {
+  Object.values(nationScores).forEach(score => {
+    score.pointsPossibleRemaining = 0;
+  });
+
+  events.forEach(event => {
+    const stage = detectStage(event);
+
+    if (stage === "group") {
+      return;
+    }
+
+    if (!scoringRules[stage]) {
+      return;
+    }
+
+    const match = parseMatch(event);
+
+    if (!match) {
+      return;
+    }
+
+    if (!isCompleted(event)) {
+      const pointsPossible = getPointsPossibleFromStage(stage);
+
+      setNationPointsPossible(nationScores, match.teamAName, pointsPossible);
+      setNationPointsPossible(nationScores, match.teamBName, pointsPossible);
+
+      return;
+    }
+
+    if (!match.winner || !isRealNationName(match.winner)) {
+      return;
+    }
+
+    const winnerPossible = getPointsPossibleAfterWin(stage);
+
+    setNationPointsPossible(nationScores, match.winner, winnerPossible);
+
+    if (stage === "sf") {
+      const loser = getLoserFromMatch(match);
+      setNationPointsPossible(nationScores, loser, 4);
+    }
+  });
+}
+
 function applyMissedKnockoutPenalties(nationScores) {
   const knockoutHasStartedOrBracketExists = Object.values(nationScores).some(score => {
     return score.knockoutAppearances > 0;
@@ -560,27 +662,28 @@ function buildLeaderboard(nationScores, draftBoard) {
         final: nationScores[nation]?.final || 0,
         missedKnockout: nationScores[nation]?.missedKnockout || 0,
         groupMatchesPlayed: nationScores[nation]?.groupMatchesPlayed || 0
+        pointsPossibleRemaining: nationScores[nation]?.pointsPossibleRemaining || 0
       }));
 
       const total = nationBreakdown.reduce((sum, item) => {
         return sum + item.score;
       }, 0);
 
-      const groupGamesPlayed = nationBreakdown.reduce((sum, item) => {
-        return sum + item.groupMatchesPlayed;
-      }, 0);
-
+     const pointsPossibleRemaining = nationBreakdown.reduce((sum, item) => {
+  return sum + item.pointsPossibleRemaining;
+}, 0);
+  
       const groupPointsRemaining =
         STARTING_GROUP_POINTS_REMAINING -
         groupGamesPlayed * GROUP_POINTS_USED_PER_MATCH;
 
       return {
-        player: entry.player,
-        nations,
-        nationBreakdown,
-        total,
-        groupGamesPlayed,
-        groupPointsRemaining
+     player: entry.player,
+  nations,
+  nationBreakdown,
+  total,
+  pointsPossibleRemaining,
+  groupPointsRemaining: pointsPossibleRemaining
       };
     })
     .sort((a, b) => b.total - a.total);
@@ -618,6 +721,8 @@ events.forEach(event => {
 });
 
 applyMissedKnockoutPenalties(nationScores);
+
+calculatePointsPossibleRemaining(events, nationScores);
   
 return {
     updatedAt: new Date().toISOString(),
