@@ -353,7 +353,7 @@
             <th>Contestant</th>
             <th>Draft Nations</th>
             <th>Total Score</th>
-            <th>Group Points Remaining</th>
+            <th>Points Possible Remaining/th>
             <th>Breakdown</th>
           </tr>
         </thead>
@@ -572,7 +572,7 @@
             <td><div class="player-name">${escapeHtml(entry.player)}</div></td>
             <td>${renderFlagGroup(entry.nations)}</td>
             <td class="score">${entry.total}</td>
-            <td class="remaining">${entry.groupPointsRemaining}</td>
+            <td class="remaining">${entry.pointsPossibleRemaining}</td>
             <td>${renderBreakdown(entry)}</td>
           `;
 
@@ -586,7 +586,7 @@
               <div>
                 <span class="rank-badge">${index + 1}</span>
                 <div class="player-name" style="margin-top: 8px;">${escapeHtml(entry.player)}</div>
-                <div class="mobile-meta">Group remaining: ${entry.groupPointsRemaining}</div>
+                <div class="mobile-meta">Possible remaining: ${entry.pointsPossibleRemaining}</div>
               </div>
               <div class="mobile-total">${entry.total} pts</div>
             </div>
