@@ -399,8 +399,7 @@ function parseMatch(event) {
   };
 }
 
-function scoreCompletedEvent(event, nationScores) {
- function isRealNationName(name) {
+function isRealNationName(name) {
   const value = String(name || "").trim().toLowerCase();
 
   if (!value) {
@@ -472,16 +471,6 @@ function scoreCompletedEvent(event, nationScores) {
 
   if (!match.winner || !isRealNationName(match.winner)) {
     return;
-  }
-
-  addNationPoints(
-    nationScores,
-    match.winner,
-    scoringRules[stage],
-    stage,
-    matchLabel
-  );
-}
   }
 
   addNationPoints(
