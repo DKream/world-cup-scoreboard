@@ -400,10 +400,29 @@ function parseMatch(event) {
 }
 
 function scoreCompletedEvent(event, nationScores) {
-  if (!isCompleted(event)) {
-    return;
+ function isRealNationName(name) {
+  const value = String(name || "").trim().toLowerCase();
+
+  if (!value) {
+    return false;
   }
 
+  if (value.includes("tbd")) {
+    return false;
+  }
+
+  if (value.includes("winner")) {
+    return false;
+  }
+
+  if (value.includes("loser")) {
+    return false;
+  }
+
+  return true;
+}
+
+function scoreCompletedEvent(event, nationScores) {
   const stage = detectStage(event);
   const match = parseMatch(event);
 
@@ -414,6 +433,10 @@ function scoreCompletedEvent(event, nationScores) {
   const matchLabel = event.name || event.shortName || "Unknown match";
 
   if (stage === "group") {
+    if (!isCompleted(event)) {
+      return;
+    }
+
     recordGroupMatchPlayed(nationScores, match.teamAName);
     recordGroupMatchPlayed(nationScores, match.teamBName);
 
@@ -431,11 +454,34 @@ function scoreCompletedEvent(event, nationScores) {
     return;
   }
 
-  recordKnockoutAppearance(nationScores, match.teamAName);
-  recordKnockoutAppearance(nationScores, match.teamBName);
-
-  if (!match.winner) {
+  if (!scoringRules[stage]) {
     return;
+  }
+
+  if (isRealNationName(match.teamAName)) {
+    recordKnockoutAppearance(nationScores, match.teamAName);
+  }
+
+  if (isRealNationName(match.teamBName)) {
+    recordKnockoutAppearance(nationScores, match.teamBName);
+  }
+
+  if (!isCompleted(event)) {
+    return;
+  }
+
+  if (!match.winner || !isRealNationName(match.winner)) {
+    return;
+  }
+
+  addNationPoints(
+    nationScores,
+    match.winner,
+    scoringRules[stage],
+    stage,
+    matchLabel
+  );
+}
   }
 
   addNationPoints(
@@ -545,8 +591,8 @@ events.forEach(event => {
   scoreCompletedEvent(event, nationScores);
 });
 
-applyMissedKnockoutPenalties(nationScores);
-
+  applyMissedKnockoutPenalties(nationScores);
+  
 return {
     updatedAt: new Date().toISOString(),
     source: "ESPN + Google Sheets",
