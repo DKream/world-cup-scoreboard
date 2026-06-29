@@ -439,25 +439,12 @@ function markKnockoutQualifiersFromEvents(events, nationScores) {
       return;
     }
 
-if (!scoringRules[stage]) {
-  return;
-}
+    if (isRealNationName(match.teamAName)) {
+      recordKnockoutAppearance(nationScores, match.teamAName);
+    }
 
-if (!isCompleted(event)) {
-  return;
-}
-
-if (!match.winner || !isRealNationName(match.winner)) {
-  return;
-}
-
-addNationPoints(
-  nationScores,
-  match.winner,
-  scoringRules[stage],
-  stage,
-  matchLabel
-);
+    if (isRealNationName(match.teamBName)) {
+      recordKnockoutAppearance(nationScores, match.teamBName);
     }
   });
 }
@@ -496,14 +483,6 @@ function scoreCompletedEvent(event, nationScores) {
 
   if (!scoringRules[stage]) {
     return;
-  }
-
-  if (isRealNationName(match.teamAName)) {
-    recordKnockoutAppearance(nationScores, match.teamAName);
-  }
-
-  if (isRealNationName(match.teamBName)) {
-    recordKnockoutAppearance(nationScores, match.teamBName);
   }
 
   if (!isCompleted(event)) {
