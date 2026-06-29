@@ -421,6 +421,47 @@ function isRealNationName(name) {
   return true;
 }
 
+function markKnockoutQualifiersFromEvents(events, nationScores) {
+  events.forEach(event => {
+    const stage = detectStage(event);
+
+    if (stage === "group") {
+      return;
+    }
+
+    if (!scoringRules[stage]) {
+      return;
+    }
+
+    const match = parseMatch(event);
+
+    if (!match) {
+      return;
+    }
+
+if (!scoringRules[stage]) {
+  return;
+}
+
+if (!isCompleted(event)) {
+  return;
+}
+
+if (!match.winner || !isRealNationName(match.winner)) {
+  return;
+}
+
+addNationPoints(
+  nationScores,
+  match.winner,
+  scoringRules[stage],
+  stage,
+  matchLabel
+);
+    }
+  });
+}
+
 function scoreCompletedEvent(event, nationScores) {
   const stage = detectStage(event);
   const match = parseMatch(event);
@@ -576,11 +617,13 @@ function calculateScores(espnData, draftBoard) {
     entry.nations.forEach(nation => ensureNation(nationScores, nation));
   });
 
+markKnockoutQualifiersFromEvents(events, nationScores);
+
 events.forEach(event => {
   scoreCompletedEvent(event, nationScores);
 });
 
-  applyMissedKnockoutPenalties(nationScores);
+applyMissedKnockoutPenalties(nationScores);
   
 return {
     updatedAt: new Date().toISOString(),
